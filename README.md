@@ -155,3 +155,154 @@ This command looks very similar to the command to create a ConfigMap, one differ
 A Secret is similar to a ConfigMap, except a Secret is used for sensitive information such as credentials. One of the main differences is that you have to explicitly tell kubectl to show you the contents of a Secret. Additionally, when it does show you the information, it only shows you a Base64 encoded version so that a casual onlooker can't accidentally see any sensitive data. Secrets don’t provide any encryption by default, that is something you’ll either need to do yourself or find an alternate option to configure.
 
 ## Updating Kubernetes resources
+
+You will now update your Kubernetes deployment to set the environment variables in your containers, based on the values configured in the ConfigMap and Secret. Edit the `kubernetes.yaml` file (located in the `start` directory). This file defines the Kubernetes deployment. Note the `valueFrom` field. This specifies the value of an environment variable, and can be set from various sources. Sources include a ConfigMap, a Secret, and information about the cluster. In this example `configMapKeyRef` sets the key `name` with the value of the ConfigMap `sys-app-name`. Similarly, `secretKeyRef` sets the keys `username` and `password` with values from the Secret `sys-app-credentials`.
+
+To update the resources open the `yaml` file
+
+`[File -> Open] /guide-kubernetes-microprofile-config/start/kubernetes.yaml`
+
+and update the file with
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: system-deployment
+  labels:
+    app: system
+spec:
+  selector:
+    matchLabels:
+      app: system
+  template:
+    metadata:
+      labels:
+        app: system
+    spec:
+      containers:
+      - name: system-container
+        image: system:1.0-SNAPSHOT
+        ports:
+        - containerPort: 9080
+        # Set the APP_NAME environment variable
+        env:
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: sys-app-name
+              key: name
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-deployment
+  labels:
+    app: inventory
+spec:
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+    spec:
+      containers:
+      - name: inventory-container
+        image: inventory:1.0-SNAPSHOT
+        ports:
+        - containerPort: 9080
+        # Set the SYSTEM_APP_USERNAME and SYSTEM_APP_PASSWORD environment variables
+        env:
+        - name: SYSTEM_APP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: sys-app-credentials
+              key: username
+        - name: SYSTEM_APP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sys-app-credentials
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: system-service
+spec:
+  type: NodePort
+  selector:
+    app: system
+  ports:
+  - protocol: TCP
+    port: 9080
+    targetPort: 9080
+    nodePort: 31000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+spec:
+  type: NodePort
+  selector:
+    app: inventory
+  ports:
+  - protocol: TCP
+    port: 9080
+    targetPort: 9080
+    nodePort: 32000
+```
+
+## Deploying your changes
+
+You now need rebuild and redeploy the applications for your changes to take effect. Rebuild the application using the following commands, making sure you're in the `start` directory:
+
+`mvn package -pl system`
+
+`mvn package -pl inventory`
+
+Now you need to delete your old Kubernetes deployment then deploy your updated deployment by issuing the following commands:
+
+`kubectl delete -f kubernetes.yaml`
+
+`kubectl apply -f kubernetes.yaml`
+
+You should see the following output from the commands:
+
+```
+$ kubectl delete -f kubernetes.yaml
+deployment.apps "system-deployment" deleted
+deployment.apps "inventory-deployment" deleted
+service "system-service" deleted
+service "inventory-service" deleted
+$ kubectl apply -f kubernetes.yaml
+deployment.apps/system-deployment created
+deployment.apps/inventory-deployment created
+service/system-service created
+service/inventory-service created
+```
+
+Check the status of the pods for the services with:
+
+`kubectl get --watch pods`
+
+You should eventually see the status of **Ready** for the two services. Press `Ctrl-C` to exit the terminal command.
+
+Call the updated system service and check the headers using the curl command:
+
+`curl -u bob:bobpwd -D - http://$IP:31000/system/properties -o /dev/null`
+
+You should see that the response `X-App-Name` header has changed from system to `my-system`.
+
+Verify that inventory service is now using the Kubernetes Secret for the credentials by making the following curl request (This may take several minutes):
+
+`curl http://$IP:32000/inventory/systems/system-service`
+
+If the request fails, check you've configured the Secret correctly.
+
+## Great Work! You're done!
+You have used MicroProfile Config to externalize the configuration of two microservices, and then you configured them by creating a ConfigMap and Secret in your Kubernetes cluster.
+
+If you would like to look at the code for these microservices follow the link to the github repository. For more information about the MicroProfile specification used in this tutorial, visit the MicroProfile website with the link below.
