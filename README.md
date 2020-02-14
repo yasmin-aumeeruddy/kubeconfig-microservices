@@ -8,24 +8,25 @@ To confirm it is ready please run the following command:
 
 `kubectl version`
 
-You should now see the versions of your kubectl client and server. If so, your environment is all set up. If you do not see the version of your Kubernetes server wait a few moments and repeat the previous command until it is shown.
+The two microservices you will deploy are called system and inventory. The system microservice returns the JVM system properties of the running container and it returns the pod’s name in the HTTP header making replicas easy to distinguish from each other. The inventory microservice adds the properties from the system microservice to the inventory. This demonstrates how communication can be established between pods inside a cluster. To build these applications, navigate to the start directory and run the following command.
 
-Now you need to navigate into the project directory that has been provided for you. This contains the implementation of the MicroProfile microservices, configuration for the MicroProfile runtime, and Kubernetes configuration.
+`mvn clean package`
 
-`cd guide-kubernetes-microprofile-config/start/`
-
-You will notice their is a 'finish' directory. This contains the finished code for this tutorial for reference.
-
-The two microservices you will deploy are called 'system' and 'inventory'. The system microservice returns JVM properties information about the container it is running in. The inventory microservice adds the properties from the system microservice into the inventory. This demonstrates how communication can be achieved between two microservices in separate pod's inside a Kubernetes cluster. To build the applications with Maven, run the following commands one after the other:
-
-`mvn package -pl system`
-
-`mvn package -pl inventory`
-
-Once the services have been built, you need to deploy them to Kubernetes. To do this use the following command:
+When the build succeeds, run the following command to deploy the necessary Kubernetes resources to serve the applications.
 
 `kubectl apply -f kubernetes.yaml`
 
+When this command finishes, wait for the pods to be in the Ready state. Run the following command to view the status of the pods.
+
+`kubectl get pods`
+
+When the pods are ready, the output shows 1/1 for READY and Running for STATUS.
+```
+NAME                                   READY     STATUS    RESTARTS   AGE
+system-deployment-6bd97d9bf6-6d2cj     1/1       Running   0          34s
+inventory-deployment-645767664f-7gnxf  1/1       Running   0          34s
+After the pods are ready, you will make requests to your services.
+```
 ## Making requests to the microservices
 
 Issue the following command to check the status of your microservices:
@@ -36,29 +37,21 @@ If you see 0/1 beside the status **not ready**, wait a little while and check ag
 
 Now your microservices are deployed and running with the **Ready** status you are ready to send some requests. Press `Ctrl-C` to exit the terminal command. Your pod currently does not have health checks implemented so even though the above command says **Ready** you application may not be ready to receive requests. Adding health checks is beyond the scope of this tutorial but it is something to keep in mind when using Kubernetes.
 
-Firstly check the IP address of your Kubernetes cluster by running the following command:
-
-`minikube ip`
-
-Now you need to set the environment variable IP to the IP address of your Kubernetes cluster by running the following command:
-
-`IP=$(minikube ip)`
-
 Next, you'll use `curl` to make an **HTTP GET** request to the 'system' service. The service is secured with a user id and password that is passed in the request.
 
-`curl -u bob:bobpwd http://$IP:31000/system/properties`
+`curl -u bob:bobpwd http://localhost:31000/system/properties`
 
 You should see a response that will show you the JVM system properties of the running container.
 
 Similarly, use the following curl command to call the inventory service:
 
-`curl http://$IP:32000/inventory/systems/system-service`
+`curl http://localhost:32000/inventory/systems/system-service`
 
 The inventory service will call the system service and store the response data in the inventory service before returning the result.
 
 In this tutorial, you're going to use a Kubernetes ConfigMap to modify the `X-App-Name:` response header. Take a look at their current values by running the following curl command:
 
-`curl -u bob:bobpwd -D - http://$IP:31000/system/properties -o /dev/null`
+`curl -u bob:bobpwd -D - http://localhost:31000/system/properties -o /dev/null`
 
 ## Modifying the System Microservice
 
