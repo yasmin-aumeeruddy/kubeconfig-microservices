@@ -1,3 +1,5 @@
+For development git clone: https://github.com/jamiecoleman92/guide-kubernetes-microprofile-config for lab
+
 ## Configuring a Kubernetes Microservice
 
 ### Build and Deploy the Java microservices
