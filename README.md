@@ -39,8 +39,9 @@ When the pods are ready, the output shows 1/1 for READY and Running for STATUS.
 NAME                                   READY     STATUS    RESTARTS   AGE
 system-deployment-6bd97d9bf6-6d2cj     1/1       Running   0          34s
 inventory-deployment-645767664f-7gnxf  1/1       Running   0          34s
-After the pods are ready, you will make requests to your services.
 ```
+After the pods are ready, you will make requests to your services.
+
 ## Making requests to the microservices
 
 If you see 0/1 beside the status **not ready**, wait a little while and check again. This will change to 1/1 and **Running** when your microservices are ready to receive requests.
