@@ -42,6 +42,13 @@ Take a look at which port the nodes are assigned to and take note:
 
 `kubectl get services`
 
+```
+NAME                TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+inventory-service   NodePort   172.21.253.135   <none>        9080:32000/TCP   71m
+system-service      NodePort   172.21.176.36    <none>        9080:31000/TCP   71m
+```
+For example take note of 32000 and 31000 as they are the node ports
+
 ## Making requests to the microservices
 
 If you see 0/1 **not ready** status, wait and check again as the pods are starting up. This will change to 1/1 and **Running** when your microservices are ready to receive requests.
@@ -52,7 +59,11 @@ Your pod currently does not have health checks implemented so even though the ab
 
 Next, you'll use `curl` to make an **HTTP GET** request to the 'system' service. The service is secured with a user ID and password that is passed in the request.
 
-`curl -u bob:bobpwd http://localhost:31000/system/properties`
+`curl http://10.114.85.172:<node port>/system/properties`
+
+For example:
+
+`curl http://10.114.85.172:32000/system/properties`
 
 You should see a response that will show you the JVM system properties of the running container.
 
