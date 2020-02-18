@@ -42,9 +42,13 @@ inventory-deployment-645767664f-7gnxf  1/1       Running   0          34s
 ```
 After the pods are ready, you will make requests to your services.
 
+Take a look at which port the nodes are assigned to and take note:
+
+`kubectl get services`
+
 ## Making requests to the microservices
 
-If you see 0/1 beside the status **not ready**, wait a little while and check again. This will change to 1/1 and **Running** when your microservices are ready to receive requests.
+If you see 0/1 **not ready** status, wait and check again as the pods are starting up. This will change to 1/1 and **Running** when your microservices are ready to receive requests.
 
 Now your microservices are deployed and running with the **Ready** status you are ready to send some requests. 
 
