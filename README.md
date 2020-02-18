@@ -1,11 +1,9 @@
 ## Configuring a Kubernetes Microservice
 
 ### Build and Deploy the Java microservices
-
-#### Getting Started
-
 <br>
-
+#### Getting Started
+<br>
 The fastest way to work through this guide is to clone the Git repository and use the projects that are provided inside:
 
 `git clone https://github.com/tomjenningss/kubeconfig-microservices.git`
