@@ -8,6 +8,8 @@ The fastest way to work through this guide is to clone the Git repository and us
 
 `git clone https://github.com/tomjenningss/kubeconfig-microservices.git`
 
+Navigate to the start directory:
+
 `cd kubeconfig-microservices/guide-kubernetes-microprofile-config/start/`
 
 Check out which Kubernetes version is running:
