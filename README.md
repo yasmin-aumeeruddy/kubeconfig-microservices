@@ -2,6 +2,7 @@
 
 ### Build and Deploy the Java microservices
 <br>
+
 #### Getting Started
 <br>
 The fastest way to work through this guide is to clone the Git repository and use the projects that are provided inside:
