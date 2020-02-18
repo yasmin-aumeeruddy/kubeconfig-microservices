@@ -1,14 +1,24 @@
-For development git clone: https://github.com/jamiecoleman92/guide-kubernetes-microprofile-config for lab
-
 ## Configuring a Kubernetes Microservice
 
 ### Build and Deploy the Java microservices
+
+#### Getting Started
+
+The fastest way to work through this guide is to clone the Git repository and use the projects that are provided inside:
+
+`git clone https://github.com/tomjenningss/kubeconfig-microservices.git`
+
+`cd kubeconfig-microservices/guide-kubernetes-microprofile-config/start/`
 
 Check out which Kubernetes version is running:
 
 `kubectl version`
 
-The two microservices you will deploy are called system and inventory. The system microservice returns the JVM system properties of the running container and it returns the pod’s name in the HTTP header making replicas easy to distinguish from each other. The inventory microservice adds the properties from the system microservice to the inventory. This demonstrates how communication can be established between pods inside a cluster. To build these applications, navigate to the start directory and run the following command.
+The two microservices you will deploy are called `system` and `inventory`. 
+
+The `system` microservice returns the JVM system properties of the running container and it returns the pod’s name in the HTTP header making replicas easy to distinguish from each other. 
+
+The `inventory` microservice adds the properties from the system microservice to the inventory. This demonstrates how communication can be established between pods inside a cluster. To build these applications, navigate to the start directory and run the following command.
 
 `mvn clean package`
 
@@ -29,15 +39,13 @@ After the pods are ready, you will make requests to your services.
 ```
 ## Making requests to the microservices
 
-Issue the following command to check the status of your microservices:
-
-`kubectl get --watch pods`
-
 If you see 0/1 beside the status **not ready**, wait a little while and check again. This will change to 1/1 and **Running** when your microservices are ready to receive requests.
 
-Now your microservices are deployed and running with the **Ready** status you are ready to send some requests. Press `Ctrl-C` to exit the terminal command. Your pod currently does not have health checks implemented so even though the above command says **Ready** you application may not be ready to receive requests. Adding health checks is beyond the scope of this tutorial but it is something to keep in mind when using Kubernetes.
+Now your microservices are deployed and running with the **Ready** status you are ready to send some requests. 
 
-Next, you'll use `curl` to make an **HTTP GET** request to the 'system' service. The service is secured with a user id and password that is passed in the request.
+Your pod currently does not have health checks implemented so even though the above command says **Ready** your application may not be ready to receive requests. Adding health checks is beyond the scope of this tutorial but it is something to keep in mind when using Kubernetes.
+
+Next, you'll use `curl` to make an **HTTP GET** request to the 'system' service. The service is secured with a user ID and password that is passed in the request.
 
 `curl -u bob:bobpwd http://localhost:31000/system/properties`
 
