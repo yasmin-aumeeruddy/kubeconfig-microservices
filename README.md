@@ -52,18 +52,18 @@ system-service      NodePort   172.21.176.36    <none>        9080:31000/TCP   7
 ```
 There are two ports specified under the Port(s) collumn for each service and they are shown as {target port}/{node port}/TCP, for example, 9080:32000/TCP where 9080 is the target port and 32000 is the node port. Take note of each node port shown from the command.
 
-Set the 'syPort' and 'inPort' variables to the correct node ports for each service:
+Set the 'sysPort' and 'invPort' variables to the correct node ports for each service:
 
-syPort={port} and inPort={port}
+sysPort={port} and invPort={port}
 
 Check that they have been set correctly:
 
-echo $syPort && echo $inPort
+echo $sysPort && echo $invPort
 
 You should see an output consisting of both node ports.
 
-syPort=3100
-inPort = 3200
+sysPort=3100
+invPort = 3200
 
 To find the IP addresses required to access the services, use the following command:
 
@@ -85,13 +85,13 @@ Node:           10.114.85.172/10.114.85.172
 Start Time:     Wed, 19 Feb 2020 10:39:26 +000
 ```
 
-Like you did with the node ports, set the sysIP and inIP variables to the right IP addresses for the services:
+Like you did with the node ports, set the sysIP and invIP variables to the right IP addresses for the services:
 
 sysIP={IP address} invIP={IP address}
 
 Check that they have been set correctly:
 
-`echo $nameIP && echo $pingIP`
+`echo $sysIP && echo $invIP`
 
 You should see an output consisting of both IP addresses.
 
@@ -99,19 +99,19 @@ You should see an output consisting of both IP addresses.
 
 Next, you'll use `curl` to make an **HTTP GET** request to the 'system' service. The service is secured with a user ID and password that is passed in the request.
 
-`curl -u bob:bobpwd http://$IP:$syPort/system/properties`
+`curl -u bob:bobpwd http://$sysIP:$sysPort/system/properties`
 
 You should see a response that will show you the JVM system properties of the running container.
 
 Similarly, use the following curl command to call the inventory service:
 
-`curl -u bob:bobpwd http://$IP:$inPort/inventory/systems/system-service`
+`curl -u bob:bobpwd http://$invIP:$invPort/inventory/systems/system-service`
 
 The inventory service will call the system service and store the response data in the inventory service before returning the result.
 
 In this tutorial, you're going to use a Kubernetes ConfigMap to modify the `X-App-Name:` response header. Take a look at their current values by running the following curl command:
 
-`curl -u bob:bobpwd -D - http://$IP:$inPort/system/properties -o /dev/null`
+`curl -u bob:bobpwd -D - http://$invIP:$invPort/system/properties -o /dev/null`
 
 ## Modifying the System Microservice
 
@@ -235,7 +235,7 @@ spec:
     spec:
       containers:
       - name: system-container
-        image: system:1.0-SNAPSHOT
+        image: tomjenningss/system:1.0-SNAPSHOT
         ports:
         - containerPort: 9080
         # Set the APP_NAME environment variable
@@ -263,7 +263,7 @@ spec:
     spec:
       containers:
       - name: inventory-container
-        image: inventory:1.0-SNAPSHOT
+        image: tomjenningss/inventory:1.0-SNAPSHOT
         ports:
         - containerPort: 9080
         # Set the SYSTEM_APP_USERNAME and SYSTEM_APP_PASSWORD environment variables
@@ -291,7 +291,6 @@ spec:
   - protocol: TCP
     port: 9080
     targetPort: 9080
-    nodePort: 31000
 ---
 apiVersion: v1
 kind: Service
@@ -305,16 +304,13 @@ spec:
   - protocol: TCP
     port: 9080
     targetPort: 9080
-    nodePort: 32000
 ```
 
 ## Deploying your changes
 
 You now need rebuild and redeploy the applications for your changes to take effect. Rebuild the application using the following commands, making sure you're in the `start` directory:
 
-`mvn package -pl system`
-
-`mvn package -pl inventory`
+`mvn clean package`
 
 Now you need to delete your old Kubernetes deployment then deploy your updated deployment by issuing the following commands:
 
@@ -345,13 +341,13 @@ You should eventually see the status of **Ready** for the two services. Press `C
 
 Call the updated system service and check the headers using the curl command:
 
-`curl -u bob:bobpwd -D - http://$IP:31000/system/properties -o /dev/null`
+`curl -u bob:bobpwd -D - http://$sysIP:$sysPort/system/properties -o /dev/null`
 
 You should see that the response `X-App-Name` header has changed from system to `my-system`.
 
 Verify that inventory service is now using the Kubernetes Secret for the credentials by making the following curl request (This may take several minutes):
 
-`curl http://$IP:32000/inventory/systems/system-service`
+`curl http://$invIP:$invPort/inventory/systems/system-service`
 
 If the request fails, check you've configured the Secret correctly.
 
