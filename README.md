@@ -31,6 +31,7 @@ When this command finishes, wait for the pods to be in the 'Ready' state. To che
 `kubectl get pods`
 
 When the pods are ready, the output shows 1/1 for 'READY' and Running for 'STATUS':
+
 ```
 NAME                                   READY     STATUS    RESTARTS   AGE
 system-deployment-6bd97d9bf6-6d2cj     1/1       Running   0          34s
