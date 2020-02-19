@@ -18,11 +18,11 @@ The two microservices you will deploy are called `system` and `inventory`.
 
 The `system` microservice returns the JVM system properties of the running container and it returns the pod’s name in the HTTP header making replicas easy to distinguish from each other. 
 
-The `inventory` microservice adds the properties from the system microservice to the inventory. This demonstrates how communication can be established between pods inside a cluster. To build these applications, navigate to the start directory and run the following command.
+The `inventory` microservice adds the properties from the system microservice to the inventory. This demonstrates how communication can be established between pods inside a cluster. To build these applications, navigate to the start directory and run:
 
 `mvn clean package`
 
-When the build succeeds, run the following command to deploy the necessary Kubernetes resources to serve the application.
+When the build succeeds, run the following command to deploy the necessary Kubernetes resources to serve the application:
 
 `kubectl apply -f kubernetes.yaml`
 
@@ -54,13 +54,15 @@ There are two ports specified under the Port(s) collumn for each service and the
 
 Set the 'sysPort' and 'invPort' variables to the correct node ports for each service:
 
-sysPort={port} and invPort={port}
+`sysPort=<port>` 
+
+`invPort=<port>`
 
 Check that they have been set correctly:
 
-echo $sysPort && echo $invPort
+`echo $sysPort && echo $invPort`
 
-You should see an output consisting of both node ports.
+You should see an output consisting of both node ports:
 
 sysPort=3100
 invPort = 3200
@@ -87,7 +89,9 @@ Start Time:     Wed, 19 Feb 2020 10:39:26 +000
 
 Like you did with the node ports, set the sysIP and invIP variables to the right IP addresses for the services:
 
-sysIP={IP address} invIP={IP address}
+`sysIP=<IP address>` 
+
+`invIP=<IP address>`
 
 Check that they have been set correctly:
 
