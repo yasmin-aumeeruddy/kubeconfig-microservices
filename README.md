@@ -22,21 +22,24 @@ The `inventory` microservice adds the properties from the system microservice to
 
 `mvn clean package`
 
-When the build succeeds, run the following command to deploy the necessary Kubernetes resources to serve the applications.
+When the build succeeds, run the following command to deploy the necessary Kubernetes resources to serve the application.
 
 `kubectl apply -f kubernetes.yaml`
 
-When this command finishes, wait for the pods to be in the Ready state. Run the following command to view the status of the pods.
+When this command finishes, wait for the pods to be in the 'Ready' state. To check if they are in the 'Ready' state:
 
 `kubectl get pods`
 
-When the pods are ready, the output shows 1/1 for READY and Running for STATUS.
+When the pods are ready, the output shows 1/1 for 'READY' and Running for 'STATUS':
 ```
 NAME                                   READY     STATUS    RESTARTS   AGE
 system-deployment-6bd97d9bf6-6d2cj     1/1       Running   0          34s
 inventory-deployment-645767664f-7gnxf  1/1       Running   0          34s
 ```
-After the pods are ready, you will make requests to your services.
+
+If you see 0/1 **not ready** status, wait and check again as the pods are starting up. This will change to 1/1 and **Running** when your microservices are ready to receive requests.
+
+Now your microservices are deployed and running with the **Ready** status you are ready to send some requests. 
 
 Take a look at which port the nodes are assigned to and take note:
 
@@ -47,35 +50,68 @@ NAME                TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)          A
 inventory-service   NodePort   172.21.253.135   <none>        9080:32000/TCP   71m
 system-service      NodePort   172.21.176.36    <none>        9080:31000/TCP   71m
 ```
-For example take note of 32000 and 31000 as they are the node ports
+There are two ports specified under the Port(s) collumn for each service and they are shown as {target port}/{node port}/TCP, for example, 9080:32000/TCP where 9080 is the target port and 32000 is the node port. Take note of each node port shown from the command.
+
+Set the 'syPort' and 'inPort' variables to the correct node ports for each service:
+
+syPort={port} and inPort={port}
+
+Check that they have been set correctly:
+
+echo $syPort && echo $inPort
+
+You should see an output consisting of both node ports.
+
+syPort=3100
+inPort = 3200
+
+To find the IP addresses required to access the services, use the following command:
+
+`kubectl describe pods`
+
+This command shows the details for both pods. The IP addresses for the nodes that the pods are deployed on are listed in the output. Look for the IP address that is stated next to the label Node: for each pod. For example, in the following case, the IP address would be 10.114.85.172 for the name deployment and 10.114.85.161 for the ping deployment.
+
+```
+Name:           inventory-deployment-7d8f688cc7-svlts
+Namespace:      sn-labs-thomasjennin
+Priority:       0
+Node:           10.114.85.172/10.114.85.172
+Start Time:     Wed, 19 Feb 2020 10:39:26 +0000
+...
+Name:           system-deployment-d47f94ffd-9qccr
+Namespace:      sn-labs-thomasjennin
+Priority:       0
+Node:           10.114.85.172/10.114.85.172
+Start Time:     Wed, 19 Feb 2020 10:39:26 +000
+```
+
+Like you did with the node ports, set the sysIP and inIP variables to the right IP addresses for the services:
+
+sysIP={IP address} invIP={IP address}
+
+Check that they have been set correctly:
+
+`echo $nameIP && echo $pingIP`
+
+You should see an output consisting of both IP addresses.
 
 ## Making requests to the microservices
 
-If you see 0/1 **not ready** status, wait and check again as the pods are starting up. This will change to 1/1 and **Running** when your microservices are ready to receive requests.
-
-Now your microservices are deployed and running with the **Ready** status you are ready to send some requests. 
-
-Your pod currently does not have health checks implemented so even though the above command says **Ready** your application may not be ready to receive requests. Adding health checks is beyond the scope of this tutorial but it is something to keep in mind when using Kubernetes.
-
 Next, you'll use `curl` to make an **HTTP GET** request to the 'system' service. The service is secured with a user ID and password that is passed in the request.
 
-`curl http://10.114.85.172:<node port>/system/properties`
-
-For example:
-
-`curl http://10.114.85.172:32000/system/properties`
+`curl -u bob:bobpwd http://$IP:$syPort/system/properties`
 
 You should see a response that will show you the JVM system properties of the running container.
 
 Similarly, use the following curl command to call the inventory service:
 
-`curl http://localhost:32000/inventory/systems/system-service`
+`curl -u bob:bobpwd http://$IP:$inPort/inventory/systems/system-service`
 
 The inventory service will call the system service and store the response data in the inventory service before returning the result.
 
 In this tutorial, you're going to use a Kubernetes ConfigMap to modify the `X-App-Name:` response header. Take a look at their current values by running the following curl command:
 
-`curl -u bob:bobpwd -D - http://localhost:31000/system/properties -o /dev/null`
+`curl -u bob:bobpwd -D - http://$IP:$inPort/system/properties -o /dev/null`
 
 ## Modifying the System Microservice
 
