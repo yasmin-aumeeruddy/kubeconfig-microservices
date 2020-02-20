@@ -372,9 +372,9 @@ service/inventory-service created
 
 Check the status of the pods for the services with:
 
-`kubectl get -pods`
+`kubectl get pods`
 
-You should eventually see the status of **Ready** for the two services. Press **Ctrl-C** to exit the terminal command.
+You should eventually see the status of **Ready** for the two services.
 
 Call the updated system service and check the headers using the curl command:
 
