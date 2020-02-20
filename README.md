@@ -76,8 +76,6 @@ This command shows the details for both pods. The IP addresses for the nodes tha
 
 Double click the terminal header to make it full screen in relation to the IDE:
 
-Eg: `theia@thedocker-thomasjennin: /home/project/kubeconfig-microservices/guide-kubernetes-microprofile-config/start`
-
 ```
 Name:           inventory-deployment-7d8f688cc7-svlts
 Namespace:      sn-labs-thomasjennin
