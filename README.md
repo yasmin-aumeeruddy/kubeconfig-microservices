@@ -74,6 +74,10 @@ To find the IP addresses required to access the services, use the following comm
 
 This command shows the details for both pods. The IP addresses for the nodes that the pods are deployed on are listed in the output. Look for the IP address that is stated next to the label Node: for each pod. For example, in the following case, the IP address would be 10.114.85.172 for the name deployment and 10.114.85.161 for the ping deployment.
 
+Double click the terminal header to make it full screen in relation to the IDE:
+
+Eg: `theia@thedocker-thomasjennin: /home/project/kubeconfig-microservices/guide-kubernetes-microprofile-config/start`
+
 ```
 Name:           inventory-deployment-7d8f688cc7-svlts
 Namespace:      sn-labs-thomasjennin
@@ -317,11 +321,11 @@ You now need rebuild and redeploy the applications for your changes to take effe
 
 `mvn clean package`
 
-Now you need to delete your old Kubernetes deployment. 
+Now you need to delete your old Kubernetes deployment and update the deployments. 
 
 `kubectl delete -f kubernetes.yaml`
 
-## Update Ports and IP Variables
+`kubectl apply -f kubernetes.yaml`
 
 Update the port the nodes that are assigned to and take note:
 
@@ -354,12 +358,7 @@ Check that they have been set correctly:
 
 You should see an output consisting of both IP addresses.
 
-## Then deploy your updated deployment by issuing the following commands:
-
 You should see the following output from the commands:
-
-`kubectl apply -f kubernetes.yaml`
-
 ```
 $ kubectl delete -f kubernetes.yaml
 deployment.apps "system-deployment" deleted
