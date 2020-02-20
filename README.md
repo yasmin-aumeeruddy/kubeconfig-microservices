@@ -124,7 +124,7 @@ The system service is hardcoded to have **system** as the app name. To make this
 
 Open up the **SystemResource.java** file:
 
-> [File -> Open] `/guide-kubernetes-microprofile-config/start/system/src/main/java/system/SystemResource.java` 
+> [File -> Open] /guide-kubernetes-microprofile-config/start/system/src/main/java/system/SystemResource.java
 
 Replace the the **SystemResource.java** with:
 
@@ -174,7 +174,7 @@ The inventory service is hardcoded to use **bob** and **bobpwd** as the credenti
 
 Open up the **SystemClient.java**
 
->[File -> Open] `/guide-kubernetes-microprofile-config/start/inventory/src/main/java/inventory/client/SystemClient.java`
+>[File -> Open] /guide-kubernetes-microprofile-config/start/inventory/src/main/java/inventory/client/SystemClient.java
 
 and replace the two lines under
 
@@ -218,7 +218,7 @@ You will now update your Kubernetes deployment to set the environment variables 
 
 To update the resources open the **yaml** file
 
-> [File -> Open] `/guide-kubernetes-microprofile-config/start/kubernetes.yaml`
+> [File -> Open] /guide-kubernetes-microprofile-config/start/kubernetes.yaml
 
 and update the file with
 
