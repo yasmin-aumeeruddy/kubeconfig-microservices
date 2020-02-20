@@ -63,7 +63,7 @@ Check that they have been set correctly:
 
 `echo $sysPort && echo $invPort`
 
-You should see an output consisting of both node ports:
+You should see an output consisting of both node ports **for example**:
 
 sysPort=3100
 invPort = 3200
@@ -90,7 +90,7 @@ Start Time:     Wed, 19 Feb 2020 10:39:26 +000
 
 Like you did with the node ports, set the sysIP and invIP variables to the right IP addresses for the services:
 
-`sysIP=<IP address>` 
+`sysIP=<IP address>`
 
 `invIP=<IP address>`
 
@@ -120,13 +120,13 @@ In this tutorial, you're going to use a Kubernetes ConfigMap to modify the `X-Ap
 
 ## Modifying the System Microservice
 
-The system service is hardcoded to have `system` as the app name. To make this configurable, you'll add the `appName` member and code to set the `X-App-Name` to the `SystemResource.java` file. 
+The system service is hardcoded to have **system** as the app name. To make this configurable, you'll add the **appName** member and code to set the **X-App-Name** to the **SystemResource.java** file. 
 
-Open up the `SystemResource.java` file:
+Open up the **SystemResource.java** file:
 
 > [File -> Open] `/guide-kubernetes-microprofile-config/start/system/src/main/java/system/SystemResource.java` 
 
-Replace the the `SystemResource.java` with:
+Replace the the **SystemResource.java** with:
 
 ```java
 package system;
@@ -202,7 +202,7 @@ Create a ConfigMap to configure the application name with the following kubectl 
 
 `kubectl create configmap sys-app-name --from-literal name=my-system`
 
-This command deploys a ConfigMap named **sys-app-name** to your cluster. It has a key called name with a value of **my-system**. The **--from-literal** flag allows you to specify individual key-value pairs to store in this ConfigMap. Other available options, such as `--from-file` and **--from-env-file**, provide more versatility as to how to configure. Details about these options can be found in the Kubernetes CLI documentation.
+This command deploys a ConfigMap named **sys-app-name** to your cluster. It has a key called name with a value of **my-system**. The **--from-literal** flag allows you to specify individual key-value pairs to store in this ConfigMap. Other available options, such as **--from-file** and **--from-env-file**, provide more versatility as to how to configure. Details about these options can be found in the Kubernetes CLI documentation.
 
 Create a Secret to configure the credentials that the inventory service will use to authenticate against system service with the following kubectl command:
 
@@ -317,13 +317,48 @@ You now need rebuild and redeploy the applications for your changes to take effe
 
 `mvn clean package`
 
-Now you need to delete your old Kubernetes deployment then deploy your updated deployment by issuing the following commands:
+Now you need to delete your old Kubernetes deployment. 
 
 `kubectl delete -f kubernetes.yaml`
 
-`kubectl apply -f kubernetes.yaml`
+## Update Ports and IP Variables
+
+Update the port the nodes that are assigned to and take note:
+
+`kubectl get services`
+
+Set the **sysPort** and **invPort** variables to the correct node ports for each service:
+
+`sysPort=<port>` 
+
+`invPort=<port>`
+
+Check that they have been set correctly:
+
+`echo $sysPort && echo $invPort`
+
+Update the IP addresses required to access the services, use the following command:
+
+`kubectl describe pods`
+
+
+Like you did with the node ports, set the **sysIP** **invIP** variables to the right IP addresses for the services:
+
+`sysIP=<IP address>`
+
+`invIP=<IP address>`
+
+Check that they have been set correctly:
+
+`echo $sysIP && echo $invIP`
+
+You should see an output consisting of both IP addresses.
+
+## Then deploy your updated deployment by issuing the following commands:
 
 You should see the following output from the commands:
+
+`kubectl apply -f kubernetes.yaml`
 
 ```
 $ kubectl delete -f kubernetes.yaml
@@ -340,7 +375,7 @@ service/inventory-service created
 
 Check the status of the pods for the services with:
 
-`kubectl get --watch pods`
+`kubectl get -pods`
 
 You should eventually see the status of **Ready** for the two services. Press **Ctrl-C** to exit the terminal command.
 
