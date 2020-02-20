@@ -114,7 +114,7 @@ Similarly, use the following curl command to call the inventory service:
 
 The inventory service will call the system service and store the response data in the inventory service before returning the result.
 
-In this tutorial, you're going to use a Kubernetes ConfigMap to modify the `X-App-Name:` response header. Take a look at their current values by running the following curl command:
+In this tutorial, you're going to use a Kubernetes ConfigMap to modify the **X-App-Name:** response header. Take a look at their current values by running the following curl command:
 
 `curl -u bob:bobpwd -D - http://$invIP:$invPort/system/properties -o /dev/null`
 
