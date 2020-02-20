@@ -244,7 +244,7 @@ spec:
     spec:
       containers:
       - name: system-container
-        image: tomjenningss/system:1.0-SNAPSHOT
+        image: tomjenningss/system:2.0-SNAPSHOT
         ports:
         - containerPort: 9080
         # Set the APP_NAME environment variable
@@ -272,7 +272,7 @@ spec:
     spec:
       containers:
       - name: inventory-container
-        image: tomjenningss/inventory:1.0-SNAPSHOT
+        image: tomjenningss/inventory:2.0-SNAPSHOT
         ports:
         - containerPort: 9080
         # Set the SYSTEM_APP_USERNAME and SYSTEM_APP_PASSWORD environment variables
