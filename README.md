@@ -14,11 +14,11 @@ Check out which Kubernetes version is running:
 
 `kubectl version`
 
-The two microservices you will deploy are called `system` and `inventory`. 
+The two microservices you will deploy are called **system** and **inventory**. 
 
-The `system` microservice returns the JVM system properties of the running container and it returns the pod’s name in the HTTP header making replicas easy to distinguish from each other. 
+The **system** microservice returns the JVM system properties of the running container and it returns the pod’s name in the HTTP header making replicas easy to distinguish from each other. 
 
-The `inventory` microservice adds the properties from the system microservice to the inventory. This demonstrates how communication can be established between pods inside a cluster. To build these applications, navigate to the start directory and run:
+The **inventory** microservice adds the properties from the system microservice to the inventory. This demonstrates how communication can be established between pods inside a cluster. To build these applications, navigate to the start directory and run:
 
 `mvn clean package`
 
@@ -26,11 +26,11 @@ When the build succeeds, run the following command to deploy the necessary Kuber
 
 `kubectl apply -f kubernetes.yaml`
 
-When this command finishes, wait for the pods to be in the 'Ready' state. To check if they are in the 'Ready' state:
+When this command finishes, wait for the pods to be in the **Ready** state. To check if they are in the **Ready** state:
 
 `kubectl get pods`
 
-When the pods are ready, the output shows 1/1 for 'READY' and Running for 'STATUS':
+When the pods are ready, the output shows 1/1 for **READY** and Running for **STATUS**:
 
 ```
 NAME                                   READY     STATUS    RESTARTS   AGE
@@ -53,7 +53,7 @@ system-service      NodePort   172.21.176.36    <none>        9080:31000/TCP   7
 ```
 There are two ports specified under the Port(s) collumn for each service and they are shown as {target port}/{node port}/TCP, for example, 9080:32000/TCP where 9080 is the target port and 32000 is the node port. Take note of each node port shown from the command.
 
-Set the 'sysPort' and 'invPort' variables to the correct node ports for each service:
+Set the **sysPort** and **invPort** variables to the correct node ports for each service:
 
 `sysPort=<port>` 
 
@@ -102,7 +102,7 @@ You should see an output consisting of both IP addresses.
 
 ## Making requests to the microservices
 
-Next, you'll use `curl` to make an **HTTP GET** request to the 'system' service. The service is secured with a user ID and password that is passed in the request.
+Next, you'll use **curl** to make an **HTTP GET** request to the 'system' service. The service is secured with a user ID and password that is passed in the request.
 
 `curl -u bob:bobpwd http://$sysIP:$sysPort/system/properties`
 
@@ -124,7 +124,7 @@ The system service is hardcoded to have `system` as the app name. To make this c
 
 Open up the `SystemResource.java` file:
 
-`[File -> Open] /guide-kubernetes-microprofile-config/start/system/src/main/java/system/SystemResource.java` 
+> [File -> Open] `/guide-kubernetes-microprofile-config/start/system/src/main/java/system/SystemResource.java` 
 
 Replace the the `SystemResource.java` with:
 
@@ -166,19 +166,19 @@ public class SystemResource {
 }
 ```
 
-These changes use MicroProfile Config and CDI to inject the value of an environment variable called `APP_NAME` into the `appName` member of the `SystemResource` class. MicroProfile Config supports a number of `config sources` from which to receive configuration, including environment variables.
+These changes use MicroProfile Config and CDI to inject the value of an environment variable called **APP_NAME** into the **appName** member of the **SystemResource** class. MicroProfile Config supports a number of **config sources** from which to receive configuration, including environment variables.
 
 ## Modifying the Inventory Microservice
 
-The inventory service is hardcoded to use `bob` and `bobpwd` as the credentials to authenticate against the system service. You’ll make these credentials configurable using a Kubernetes `secret`.
+The inventory service is hardcoded to use **bob** and **bobpwd** as the credentials to authenticate against the system service. You’ll make these credentials configurable using a Kubernetes **secret**.
 
-Open up the `SystemClient.java`
+Open up the **SystemClient.java**
 
-`[File -> Open] /guide-kubernetes-microprofile-config/start/inventory/src/main/java/inventory/client/SystemClient.java`
+>[File -> Open] `/guide-kubernetes-microprofile-config/start/inventory/src/main/java/inventory/client/SystemClient.java`
 
 and replace the two lines under
 
-`// Basic Auth Credentials` with:
+**// Basic Auth Credentials** with:
 
 ```java
 
@@ -192,7 +192,7 @@ and replace the two lines under
   private String password;
 ```
 
-These changes use MicroProfile Config and CDI to inject the value of the environment variables `SYSTEM_APP_USERNAME` and `SYSTEM_APP_PASSWORD` into the SystemClient class.
+These changes use MicroProfile Config and CDI to inject the value of the environment variables **SYSTEM_APP_USERNAME** and **SYSTEM_APP_PASSWORD** into the SystemClient class.
 
 ## Creating a ConfigMap and Secret
 
@@ -202,23 +202,23 @@ Create a ConfigMap to configure the application name with the following kubectl 
 
 `kubectl create configmap sys-app-name --from-literal name=my-system`
 
-This command deploys a ConfigMap named `sys-app-name` to your cluster. It has a key called name with a value of `my-system`. The `--from-literal` flag allows you to specify individual key-value pairs to store in this ConfigMap. Other available options, such as `--from-file` and `--from-env-file`, provide more versatility as to how to configure. Details about these options can be found in the Kubernetes CLI documentation.
+This command deploys a ConfigMap named **sys-app-name** to your cluster. It has a key called name with a value of **my-system**. The **--from-literal** flag allows you to specify individual key-value pairs to store in this ConfigMap. Other available options, such as `--from-file` and **--from-env-file**, provide more versatility as to how to configure. Details about these options can be found in the Kubernetes CLI documentation.
 
 Create a Secret to configure the credentials that the inventory service will use to authenticate against system service with the following kubectl command:
 
 `kubectl create secret generic sys-app-credentials --from-literal username=bob --from-literal password=bobpwd`
 
-This command looks very similar to the command to create a ConfigMap, one difference is the word generic. It means that you’re creating a Secret that is `generic`, which means it is not a specialized type of secret. There are different types of secrets, such as secrets to store Docker credentials and secrets to store public/private key pairs.
+This command looks very similar to the command to create a ConfigMap, one difference is the word generic. It means that you’re creating a Secret that is **generic**, which means it is not a specialized type of secret. There are different types of secrets, such as secrets to store Docker credentials and secrets to store public/private key pairs.
 
 A Secret is similar to a ConfigMap, except a Secret is used for sensitive information such as credentials. One of the main differences is that you have to explicitly tell kubectl to show you the contents of a Secret. Additionally, when it does show you the information, it only shows you a Base64 encoded version so that a casual onlooker can't accidentally see any sensitive data. Secrets don’t provide any encryption by default, that is something you’ll either need to do yourself or find an alternate option to configure.
 
 ## Updating Kubernetes resources
 
-You will now update your Kubernetes deployment to set the environment variables in your containers, based on the values configured in the ConfigMap and Secret. Edit the `kubernetes.yaml` file (located in the `start` directory). This file defines the Kubernetes deployment. Note the `valueFrom` field. This specifies the value of an environment variable, and can be set from various sources. Sources include a ConfigMap, a Secret, and information about the cluster. In this example `configMapKeyRef` sets the key `name` with the value of the ConfigMap `sys-app-name`. Similarly, `secretKeyRef` sets the keys `username` and `password` with values from the Secret `sys-app-credentials`.
+You will now update your Kubernetes deployment to set the environment variables in your containers, based on the values configured in the ConfigMap and Secret. Edit the **kubernetes.yaml** file (located in the **start** directory). This file defines the Kubernetes deployment. Note the **valueFrom** field. This specifies the value of an environment variable, and can be set from various sources. Sources include a ConfigMap, a Secret, and information about the cluster. In this example **configMapKeyRef** sets the key **name** with the value of the ConfigMap **sys-app-name**. Similarly, **secretKeyRef** sets the keys **username** and **password** with values from the Secret **sys-app-credentials**.
 
-To update the resources open the `yaml` file
+To update the resources open the **yaml** file
 
-`[File -> Open] /guide-kubernetes-microprofile-config/start/kubernetes.yaml`
+> [File -> Open] `/guide-kubernetes-microprofile-config/start/kubernetes.yaml`
 
 and update the file with
 
@@ -313,7 +313,7 @@ spec:
 
 ## Deploying your changes
 
-You now need rebuild and redeploy the applications for your changes to take effect. Rebuild the application using the following commands, making sure you're in the `start` directory:
+You now need rebuild and redeploy the applications for your changes to take effect. Rebuild the application using the following commands, making sure you're in the **start** directory:
 
 `mvn clean package`
 
@@ -342,13 +342,13 @@ Check the status of the pods for the services with:
 
 `kubectl get --watch pods`
 
-You should eventually see the status of **Ready** for the two services. Press `Ctrl-C` to exit the terminal command.
+You should eventually see the status of **Ready** for the two services. Press **Ctrl-C** to exit the terminal command.
 
 Call the updated system service and check the headers using the curl command:
 
 `curl -u bob:bobpwd -D - http://$sysIP:$sysPort/system/properties -o /dev/null`
 
-You should see that the response `X-App-Name` header has changed from system to `my-system`.
+You should see that the response **X-App-Name** header has changed from system to **my-system**.
 
 Verify that inventory service is now using the Kubernetes Secret for the credentials by making the following curl request (This may take several minutes):
 
